@@ -1,7 +1,7 @@
 <?php
 
 // Directory
-$directory = $_GET["videoFolder"] . "/";
+$directory = $_POST["videoFolder"] . "/";
 
 
 $files = glob($directory . "*.{jpg,jpeg,png,gif}",GLOB_BRACE);
