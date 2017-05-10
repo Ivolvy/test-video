@@ -46,9 +46,8 @@ App.prototype.getImages = function(){
         }
     };
 
-    http.open("POST", "function.php", true);
-    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    http.send(params);
+    http.open("GET", "function.php?"+params, true);
+    http.send();
 };
 
 
