@@ -20,6 +20,11 @@ AppJson.prototype.initVars = function(){
     appJson.initializeControls();
 
     appJson.getJsonFile();
+
+
+    /*Video formats
+    1280 x 720
+    854 x 480*/
 };
 
 /**
