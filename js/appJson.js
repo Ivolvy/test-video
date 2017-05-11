@@ -57,7 +57,7 @@ AppJson.prototype.launch = function(jsonFile){
 AppJson.prototype.displayFrames = function(jsonFile){
     var that = this;
 
-    if(this.currentFrame == jsonFile.frames.length){
+    if(this.currentFrame == jsonFile.frames.length + 1){
         clearInterval(that.interval);
     } else {
         console.log("currentFrame: " + this.currentFrame);
@@ -71,4 +71,3 @@ AppJson.prototype.displayFrames = function(jsonFile){
 
 var appJson = new AppJson();
 appJson.init();
-appJson.getJsonFile();
