@@ -1,11 +1,11 @@
-var App = function(){};
+var AppImages = function(){};
 
 
-App.prototype.init = function(){
+AppImages.prototype.init = function(){
     this.initVars();
 };
 
-App.prototype.initVars = function(){
+AppImages.prototype.initVars = function(){
     this.videoElement = document.getElementById("imagesToVideo");
 
     this.videoFolder = "imagesVideo";
@@ -25,14 +25,14 @@ App.prototype.initVars = function(){
 /**
  * Get all the images of the video
  */
-App.prototype.getImages = function(){
+AppImages.prototype.getImages = function(){
     var that = this;
 
     var http = new XMLHttpRequest();
     var params = "videoFolder=" + this.videoFolder;
-    http.onloadend = app.onLoadEnd;
+    http.onloadend = appImages.onLoadEnd;
 
-    http.onprogress = app.onProgress;
+    http.onprogress = appImages.onProgress;
 
     http.onreadystatechange = function() {
         if (http.readyState == XMLHttpRequest.DONE) {
@@ -40,16 +40,15 @@ App.prototype.getImages = function(){
                 that.numberOfImages = http.responseText;
 
                 for (var i = 0; i < that.numberOfImages; i++) {
-                    this.imageNumber = app.updateImageNumber(i);
-
-                    app.preloadImages(this.imageNumber);
+                    this.imageNumber = appImages.updateImageNumber(i);
+                    appImages.preloadImages(this.imageNumber);
                 }
             }
         }
     };
 
     http.open("POST", "function.php", true);
-    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.setRequestHeader("Content-type", "appImageslication/x-www-form-urlencoded");
     http.send(params);
 };
 
@@ -58,17 +57,17 @@ App.prototype.getImages = function(){
  * Play when all the images are preload
  * @param event
  */
-App.prototype.onLoadEnd = function(event) {
+AppImages.prototype.onLoadEnd = function(event) {
     console.log("Preload ended");
 
-    app.play();
+    appImages.play();
 };
 
 /**
  * On progress preload images
  * @param event
  */
-App.prototype.onProgress = function(event) {
+AppImages.prototype.onProgress = function(event) {
     console.log("Loading");
 };
 
@@ -77,7 +76,7 @@ App.prototype.onProgress = function(event) {
  * Preload images
  * @param i
  */
-App.prototype.preloadImages = function(i){
+AppImages.prototype.preloadImages = function(i){
     this.images[i] = new Image();
     this.images[i].src = this.videoFolder + "/" + this.videoImages + i + this.imageExtension;
 
@@ -89,7 +88,7 @@ App.prototype.preloadImages = function(i){
  * @param increment
  * @returns {string|*}
  */
-App.prototype.updateImageNumber = function(increment){
+AppImages.prototype.updateImageNumber = function(increment){
     this.str = "" + increment;
     console.log("increment: " + increment);
     this.imageNumber = this.pad.substring(0, this.pad.length - this.str.length) + this.str;
@@ -103,19 +102,19 @@ App.prototype.updateImageNumber = function(increment){
 /**
  * Play all the frames
  */
-App.prototype.play = function() {
+AppImages.prototype.play = function() {
     console.log("play");
 
     this.str = "" + 0;
     this.increment = 0;
 
-    this.interval = setInterval(app.frame.bind(this), this.imageInterval);
+    this.interval = setInterval(appImages.frame.bind(this), this.imageInterval);
 };
 
 /**
  * Each frame for the video
  */
-App.prototype.frame = function() {
+AppImages.prototype.frame = function() {
     console.log("frame");
 
     this.str = "" + this.increment;
@@ -133,5 +132,5 @@ App.prototype.frame = function() {
 
 
 
-var app = new App();
-app.init();
+var appImages = new AppImages();
+appImages.init();

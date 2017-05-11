@@ -34,7 +34,7 @@ $imageExtension = $argv[4];
 $outputName = $argv[5];
 $framesTab[] = "";
 
-
+//Fille the tab with all base64 frames
 for($i = $frameStart; $i < $frameEnd; $i++){
     $image = $folder . $i . $imageExtension;
     $framesTab[] = getBase64Image($image);
