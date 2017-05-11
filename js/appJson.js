@@ -6,14 +6,89 @@ AppJson.prototype.init = function(){
 };
 
 AppJson.prototype.initVars = function(){
-    this.videoTarget = document.getElementById("imagesToVideo");
-    this.videoJsonElement = document.getElementById("videoPlayer");
-    this.videoFile = this.videoJsonElement.getAttribute("data-videoPlayer");
+    this.videoContainer = document.getElementById("videoPlayer");
+    this.videoFile = this.videoContainer.getAttribute("data-videoPlayer");
 
     this.rate = 24;
     this.imageInterval = 1000/this.rate;
 
     this.currentFrame = 0;
+    this.pause = false;
+
+
+    appJson.createVideoTarget();
+    appJson.initializeControls();
+
+    appJson.getJsonFile();
+};
+
+/**
+ * Create video target element
+ */
+AppJson.prototype.createVideoTarget = function(){
+    this.videoTarget = document.createElement('img');
+    this.videoTarget.setAttribute('id', 'imagesToVideo');
+
+    this.videoContainer.appendChild(this.videoTarget);
+};
+
+
+/**
+ * Initialize controls (play/pause/...)
+ */
+AppJson.prototype.initializeControls = function() {
+
+    this.controls = document.createElement('div');
+    this.controls.setAttribute('class', 'controls');
+
+    this.playButton = document.createElement('button');
+    this.playButton.setAttribute('class', 'playButton');
+    this.playButton.innerHTML = 'Play';
+    this.playButton.addEventListener("click", function(){
+        appJson.playVideo();
+    }, false);
+
+    this.controls.appendChild(this.playButton);
+
+
+    this.pauseButton = document.createElement('button');
+    this.pauseButton.setAttribute('class', 'pauseButton');
+    this.pauseButton.innerHTML = 'Pause';
+    this.pauseButton.addEventListener("click", function(){
+        appJson.pauseVideo();
+    }, false);
+
+    if(this.pause){
+        this.pauseButton.style.display = 'none';
+    } else{
+        this.playButton.style.display = 'none';
+    }
+
+    this.controls.appendChild(this.pauseButton);
+
+
+    this.videoContainer.appendChild(this.controls);
+
+};
+
+/**
+ * Play the video
+ */
+AppJson.prototype.playVideo = function(){
+    this.pause = false;
+
+    this.playButton.style.display = 'none';
+    this.pauseButton.style.display = 'block';
+};
+
+/**
+ * Pause the video
+ */
+AppJson.prototype.pauseVideo = function(){
+    this.pause = true;
+
+    this.playButton.style.display = 'block';
+    this.pauseButton.style.display = 'none';
 };
 
 /**
@@ -57,7 +132,12 @@ AppJson.prototype.launch = function(jsonFile){
 AppJson.prototype.displayFrames = function(jsonFile){
     var that = this;
 
-    if(this.currentFrame == jsonFile.frames.length + 1){
+    //If video paused, don't display frames
+    if(this.pause){
+        return;
+    }
+
+    if(this.currentFrame == jsonFile.frames.length){
         clearInterval(that.interval);
     } else {
         console.log("currentFrame: " + this.currentFrame);
