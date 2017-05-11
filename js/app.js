@@ -32,6 +32,8 @@ App.prototype.getImages = function(){
     var params = "videoFolder=" + this.videoFolder;
     http.onloadend = app.onLoadEnd;
 
+    http.onprogress = app.onProgress;
+
     http.onreadystatechange = function() {
         if (http.readyState == XMLHttpRequest.DONE) {
             if (http.status == 200) {
@@ -60,6 +62,14 @@ App.prototype.onLoadEnd = function(event) {
     console.log("Preload ended");
 
     app.play();
+};
+
+/**
+ * On progress preload images
+ * @param event
+ */
+App.prototype.onProgress = function(event) {
+    console.log("Loading");
 };
 
 

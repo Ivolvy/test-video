@@ -1,4 +1,8 @@
 <?php
+/*
+ * Get numbers of images in folder
+ * */
+
 
 // Directory
 $directory = $_POST["videoFolder"] . "/";
