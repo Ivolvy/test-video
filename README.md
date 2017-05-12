@@ -5,6 +5,7 @@
 Uses ffmpeg.
 
 Steps:
+
 1/ Get all videos' frames: ffmpeg -i 720.mp4 -an -f image2 "%d.jpg"
 
 2/ Encode frames in json: php images_to_json.php frameStart frameEnd imagesFolder/ imageExtension outputName.json
