@@ -11,11 +11,6 @@
     user-select: none;
 }
 
-.spin-loader{
-
-}
-
-
 #bottomBar{
     position: absolute;
     bottom: 0;
@@ -28,6 +23,15 @@
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
     height: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+#bottomBar .barPadding{
+    height: 16px;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
 }
 
 #bottomBar .bar{
@@ -36,7 +40,7 @@
     background-color: #79bbe9;;
 }
 
-.playButton, .pauseButton{
+.playButton, .pauseButton, .reloadButton{
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -44,7 +48,7 @@
     user-select: none;
 }
 
-.playIcon, .pauseIcon{
+.playIcon, .pauseIcon, .reloadIcon{
     width: 20px;
     vertical-align: middle;
     margin: 2px;

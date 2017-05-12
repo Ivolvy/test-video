@@ -12,8 +12,11 @@ AppJson.prototype.initVars = function(){
     this.rate = 24;
     this.imageInterval = 1000/this.rate;
 
+    this.jsonFile = "";
+
     this.currentFrame = 0;
     this.pause = false;
+    this.videoEnded = false;
 
     this.totalPercent = 0;
 
@@ -23,11 +26,6 @@ AppJson.prototype.initVars = function(){
 
     appJson.initSound();
     appJson.getJsonFile();
-
-
-    /*Video formats
-    1280 x 720
-    854 x 480*/
 };
 
 
@@ -60,30 +58,75 @@ AppJson.prototype.createProgressBar = function(){
     this.progressBar = document.createElement('div');
     this.progressBar.setAttribute('class', 'progressBar');
 
+    this.barPadding = document.createElement('div');
+    this.barPadding.setAttribute('class', 'barPadding');
+
     this.bar = document.createElement('div');
     this.bar.setAttribute('class', 'bar');
 
+
     this.progressBar.appendChild(this.bar);
+    this.bar.appendChild(this.barPadding);
     this.bottomBar.appendChild(this.progressBar);
 
 
 
+    this.progressBar.addEventListener('click', function(e){
+        var posX = e.pageX - this.offsetLeft;
+
+        //Get exact percentage of progress
+        var progressSelection = posX*100/that.progressBar.offsetWidth;
+
+        appJson.goToPosition(progressSelection);
+    });
+
 
 };
 
+/**
+ * Go to position in the progress bar
+ * @param percent
+ */
+AppJson.prototype.goToPosition = function(percent){
+    if(this.reloadElement.getButton().style.display == 'block'){
+        appJson.displayBarButton(0);
+    }
 
+    this.totalPercent = percent;
+    this.bar.style.width = percent + '%';
+
+    //Select the associated frame
+    this.currentFrame = Math.round(this.jsonFile.frames.length*percent/100);
+    this.videoTarget.src = this.jsonFile.frames[this.currentFrame];
+
+    //Move to part of sound
+    this.sound.currentTime = this.sound.duration*percent/100;
+
+
+    if(this.videoEnded){
+        this.videoEnded = false;
+        this.sound.play();
+        appJson.launchVideo(this.currentFrame);
+    }
+};
 
 
 /**
  * Increase progress bar
+ * @param percent
  */
 AppJson.prototype.increaseProgressBar = function(percent){
     this.totalPercent += percent;
     this.bar.style.width = this.totalPercent + '%';
-
 };
 
-
+/**
+ * Reset progress bar
+ */
+AppJson.prototype.resetProgressBar = function(){
+    this.totalPercent = 0;
+    this.bar.style.width = this.totalPercent + '%';
+};
 
 
 /**
@@ -94,76 +137,83 @@ AppJson.prototype.initializeControls = function() {
     this.controls = document.createElement('div');
     this.controls.setAttribute('class', 'controls');
 
-
-    //Play Button
-    this.playButton = document.createElement('button');
-    this.playButton.setAttribute('class', 'playButton');
-    this.playButton.addEventListener("click", function(){
-        appJson.playVideo();
-    }, false);
-
-
-    //Play Icon
-    this.playIcon = document.createElement('img');
-    this.playIcon.setAttribute('class', 'playIcon');
-    this.playIcon.src = "resources/playButton.svg";
-    this.playButton.appendChild(this.playIcon);
-
-
-
-    //Pause Button
-    this.pauseButton = document.createElement('button');
-    this.pauseButton.setAttribute('class', 'pauseButton');
-    this.pauseButton.addEventListener("click", function(){
-        appJson.pauseVideo();
-    }, false);
-
-    //Pause Icon
-    this.pauseIcon = document.createElement('img');
-    this.pauseIcon.setAttribute('class', 'pauseIcon');
-    this.pauseIcon.src = "resources/pauseButton.svg";
-    this.pauseButton.appendChild(this.pauseIcon);
-
-
+    this.playElement = new BarElements("play", appJson.playVideo);
+    this.pauseElement = new BarElements("pause", appJson.pauseVideo);
+    this.reloadElement = new BarElements("reload", appJson.reloadVideo);
+    this.reloadElement.getButton().style.display = 'none';
 
     if(this.pause){
-        this.pauseButton.style.display = 'none';
+        this.pauseElement.getButton().style.display = 'none';
     } else{
-        this.playButton.style.display = 'none';
+        this.playElement.getButton().style.display = 'none';
     }
 
 
-    this.controls.appendChild(this.playButton);
-    this.controls.appendChild(this.pauseButton);
+    this.controls.appendChild(this.playElement.getButton());
+    this.controls.appendChild(this.pauseElement.getButton());
+    this.controls.appendChild(this.reloadElement.getButton());
 
     this.bottomBar.appendChild(this.controls);
 
 };
 
+
+
 /**
  * Play the video
  */
 AppJson.prototype.playVideo = function(){
-    this.pause = false;
+    appJson.pause = false;
 
-    this.sound.play();
-
-    this.playButton.style.display = 'none';
-    this.pauseButton.style.display = 'block';
+    appJson.sound.play();
+    appJson.displayBarButton(0);
 };
 
 /**
  * Pause the video
  */
 AppJson.prototype.pauseVideo = function(){
-    this.pause = true;
+    appJson.pause = true;
 
-    this.sound.pause();
-
-    this.playButton.style.display = 'block';
-    this.pauseButton.style.display = 'none';
+    appJson.sound.pause();
+    appJson.displayBarButton(1);
 };
 
+/**
+ * Reload the video
+ */
+AppJson.prototype.reloadVideo = function(){
+    appJson.videoEnded = false;
+
+    appJson.displayBarButton(0);
+
+    appJson.sound.play();
+    appJson.resetProgressBar();
+    appJson.launchVideo(0);
+};
+
+/**
+ * Display bar button
+ * 0: pause
+ * 1: play
+ * 2: reload
+ * @param barButton
+ */
+AppJson.prototype.displayBarButton = function(barButton){
+
+    this.pauseElement.getButton().style.display = 'none';
+    this.playElement.getButton().style.display = 'none';
+    this.reloadElement.getButton().style.display = 'none';
+
+    if(barButton == 0){
+        this.pauseElement.getButton().style.display = 'block';
+    } else if(barButton == 1){
+        this.playElement.getButton().style.display = 'block';
+    } else if(barButton == 2){
+        this.reloadElement.getButton().style.display = 'block';
+    }
+
+};
 
 /**
  * Init sound
@@ -182,15 +232,11 @@ AppJson.prototype.getJsonFile = function(){
 
     var http = new XMLHttpRequest();
 
-    http.onprogrgetJsonFileess = function() {
-        console.log("Progress");
-    };
-
     http.onreadystatechange = function() {
         if (http.readyState == XMLHttpRequest.DONE) {
             if (http.status == 200) {
-                var jsonFile = JSON.parse(http.responseText);
-                appJson.launchVideo(jsonFile);
+                that.jsonFile = JSON.parse(http.responseText);
+                appJson.launchVideo(0);
                 that.sound.play();
             }
         }
@@ -204,34 +250,37 @@ AppJson.prototype.getJsonFile = function(){
 /**
  * Launch video process
  */
-AppJson.prototype.launchVideo = function(jsonFile){
-    this.currentFrame = 0;
-
-    console.log("imageInterval: "+this.imageInterval);
-
-    this.interval = setInterval(appJson.displayFrames.bind(this, jsonFile), this.imageInterval);
+AppJson.prototype.launchVideo = function(currentFrame){
+    this.currentFrame = currentFrame;
+    this.interval = setInterval(appJson.displayFrames.bind(this, this.jsonFile), this.imageInterval);
 };
 
 /**
  * Display each frames successively
  */
-AppJson.prototype.displayFrames = function(jsonFile){
-    var that = this;
+AppJson.prototype.displayFrames = function(){
 
     //If video paused, don't display frames
     if(this.pause){
         return;
     }
 
-    if(this.currentFrame == jsonFile.frames.length){
-        clearInterval(that.interval);
+    if(this.currentFrame == this.jsonFile.frames.length){
+        clearInterval(this.interval);
+        appJson.endVideo();
     } else {
-        console.log("currentFrame: " + this.currentFrame);
-        appJson.increaseProgressBar(100/jsonFile.frames.length);
-        this.videoTarget.src = jsonFile.frames[this.currentFrame];
+        appJson.increaseProgressBar(100/this.jsonFile.frames.length);
+        this.videoTarget.src = this.jsonFile.frames[this.currentFrame];
     }
 
     this.currentFrame += 1;
+};
+
+
+AppJson.prototype.endVideo = function(){
+    this.videoEnded = true;
+
+    appJson.displayBarButton(2);
 };
 
 
